@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import s from './TableSnake.module.scss'
+import {getRandomGrid} from "../utils/getRandomGrid";
+import {CreateArrayGrid} from "../utils/CreateArrayGrid";
 
 export const TableSnake = () => {
 const [item,setItem] = useState({
@@ -7,19 +9,13 @@ const [item,setItem] = useState({
     column:10,
     arrItems:[] as Array<{row:number,column:number}>
 })
-    console.log(item)
-
 
    useEffect(() => {
-       let arr = []
-           for (let i = 0; i < item.row; i++) {
-               for (let j = 0; j < item.column; j++) {
-                   arr.push({row:i,column:j})
-               }
-           }
-           setItem({...item,arrItems: [...arr]})
+           const arrayGrid = CreateArrayGrid(item.row,item.column)
+           setItem({...item,arrItems: [...arrayGrid]})
    },[])
 
+    getRandomGrid(item.row,item.column)
 
     return (
         <div className={s.mainContainer}>
