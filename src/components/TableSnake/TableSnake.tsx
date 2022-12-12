@@ -23,7 +23,6 @@ export const INITIAL_COLUMN = 5;
 export const INITIAL_ROW = 5;
 
 export const TableSnake = () => {
-
   const [arrItems, setArrItems] = useState(
       createArrayGrid(TOTAL_ROWS, TOTAL_COLUMNS) as Array<{
         row: number;
@@ -44,11 +43,12 @@ export const TableSnake = () => {
       getRandomGrid(TOTAL_ROWS, TOTAL_COLUMNS) as { row: number; column: number }
   ); // создаем координаты еды змеи
 
-  const [currentTailCoordinates, setCurrentTailCoordinates] = useState({
-    row: currentHeadCoordinates.row,
-    column: currentHeadCoordinates.column,
-  }); // создаем координаты хвоста змеи
-
+  const [currentTailCoordinates, setCurrentTailCoordinates] = useState([
+    {
+      row: currentHeadCoordinates.row,
+      column: currentHeadCoordinates.column,
+    },
+  ] as Array<{ row: number; column: number }>); // создаем координаты хвоста змеи
 
   const handleCurrentRowChange = (value: number) => {
     setCurrentHeadCoordinates({
@@ -70,40 +70,60 @@ export const TableSnake = () => {
         case DIRECTION_TYPES.LEFT:
           if (currentHeadCoordinates.column !== MIN_COLUMN_INDEX) {
             handleCurrentColumnChange(currentHeadCoordinates.column - 1);
-            setCurrentTailCoordinates({
-              row: currentHeadCoordinates.row,
-              column: currentHeadCoordinates.column,
-            });
+            setCurrentTailCoordinates(
+                currentTailCoordinates.map((el) => {
+                  return {
+                    ...el,
+                    row: currentHeadCoordinates.row,
+                    column: currentHeadCoordinates.column,
+                  };
+                })
+            );
             break;
           }
           break;
         case DIRECTION_TYPES.RIGHT:
           if (currentHeadCoordinates.column !== MAX_COLUMN_INDEX) {
             handleCurrentColumnChange(currentHeadCoordinates.column + 1);
-            setCurrentTailCoordinates({
-              row: currentHeadCoordinates.row,
-              column: currentHeadCoordinates.column,
-            });
+            setCurrentTailCoordinates(
+                currentTailCoordinates.map((el) => {
+                  return {
+                    ...el,
+                    row: currentHeadCoordinates.row,
+                    column: currentHeadCoordinates.column,
+                  };
+                })
+            );
             break;
           }
           break;
         case DIRECTION_TYPES.TOP:
           if (currentHeadCoordinates.row !== MIN_ROW_INDEX) {
             handleCurrentRowChange(currentHeadCoordinates.row - 1);
-            setCurrentTailCoordinates({
-              column: currentHeadCoordinates.column,
-              row: currentHeadCoordinates.row,
-            });
+            setCurrentTailCoordinates(
+                currentTailCoordinates.map((el) => {
+                  return {
+                    ...el,
+                    row: currentHeadCoordinates.row,
+                    column: currentHeadCoordinates.column,
+                  };
+                })
+            );
             break;
           }
           break;
         case DIRECTION_TYPES.BOTTOM:
           if (currentHeadCoordinates.row !== MAX_ROW_INDEX) {
             handleCurrentRowChange(currentHeadCoordinates.row + 1);
-            setCurrentTailCoordinates({
-              column: currentHeadCoordinates.column,
-              row: currentHeadCoordinates.row,
-            });
+            setCurrentTailCoordinates(
+                currentTailCoordinates.map((el) => {
+                  return {
+                    ...el,
+                    row: currentHeadCoordinates.row,
+                    column: currentHeadCoordinates.column,
+                  };
+                })
+            );
             break;
           }
           break;
@@ -149,9 +169,52 @@ export const TableSnake = () => {
         currentFoodCoordinates.row === currentHeadCoordinates.row &&
         currentFoodCoordinates.column === currentHeadCoordinates.column
     ) {
-      setCurrentFoodCoordinates(getRandomGrid(TOTAL_ROWS, TOTAL_COLUMNS))
+      setCurrentFoodCoordinates(getRandomGrid(TOTAL_ROWS, TOTAL_COLUMNS));
+
+      if (currentDirection === DIRECTION_TYPES.BOTTOM) {
+        setCurrentTailCoordinates([
+          ...currentTailCoordinates,
+          {
+            row: currentTailCoordinates.slice(-1)[0].row - 1,
+            column: currentTailCoordinates.slice(-1)[0].column,
+          },
+        ]);
+      }
+      if (currentDirection === DIRECTION_TYPES.TOP) {
+        setCurrentTailCoordinates(
+            currentTailCoordinates.map((el) => {
+              return {
+                ...el,
+                row: currentHeadCoordinates.row,
+                column: currentHeadCoordinates.column + 1,
+              };
+            })
+        );
+      }
+      if (currentDirection === DIRECTION_TYPES.LEFT) {
+        setCurrentTailCoordinates(
+            currentTailCoordinates.map((el) => {
+              return {
+                ...el,
+                row: currentHeadCoordinates.row,
+                column: currentHeadCoordinates.column + 1,
+              };
+            })
+        );
+      }
+      if (currentDirection === DIRECTION_TYPES.RIGHT) {
+        setCurrentTailCoordinates(
+            currentTailCoordinates.map((el) => {
+              return {
+                ...el,
+                row: currentHeadCoordinates.row,
+                column: currentHeadCoordinates.column + 1,
+              };
+            })
+        );
+      }
     }
-  }, [currentFoodCoordinates, currentHeadCoordinates]);
+  }, [currentFoodCoordinates, currentHeadCoordinates]); // хаваем
 
   const getClassName = (isFood: boolean, isHead: boolean, isTail: boolean) => {
     if (isFood) return s.tableFoot;
@@ -172,9 +235,14 @@ export const TableSnake = () => {
               const isFood =
                   it.row === currentFoodCoordinates.row &&
                   it.column === currentFoodCoordinates.column;
-              const isTail =
-                  it.column === currentTailCoordinates.column &&
-                  it.row === currentTailCoordinates.row;
+
+              const isTail = currentTailCoordinates.reduce((acc: any, temp) => {
+                if (it.row === temp.row && it.column === temp.column) {
+                  acc = true;
+                  return acc;
+                }
+              }, false);
+
               return (
                   <div
                       key={it.row + "-" + it.column}
