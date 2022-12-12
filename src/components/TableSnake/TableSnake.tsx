@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import s from "./TableSnake.module.scss";
 import { createArrayGrid } from "../utils/createArrayGrid";
+import { getRandomGrid } from "../utils/getRandomGrid";
 
 export enum DIRECTION_TYPES {
   RIGHT,
@@ -22,71 +23,87 @@ export const INITIAL_COLUMN = 5;
 export const INITIAL_ROW = 5;
 
 export const TableSnake = () => {
+
   const [arrItems, setArrItems] = useState(
-    createArrayGrid(TOTAL_ROWS, TOTAL_COLUMNS) as Array<{
-      row: number;
-      column: number;
-      isFood: boolean;
-      isHead: boolean;
-    }>
-  );
+      createArrayGrid(TOTAL_ROWS, TOTAL_COLUMNS) as Array<{
+        row: number;
+        column: number;
+      }>
+  ); // Создаём массив с 100 ячейками
+
+  const [currentDirection, setCurrentDirection] = useState<DIRECTION_TYPES>(
+      DIRECTION_TYPES.BOTTOM
+  ); // направление движения   RIGHT,LEFT,TOP,BOTTOM
+
   const [currentHeadCoordinates, setCurrentHeadCoordinates] = useState({
     row: INITIAL_ROW,
     column: INITIAL_COLUMN,
-  });
+  }); // создаем координаты головы змейки
+
+  const [currentFoodCoordinates, setCurrentFoodCoordinates] = useState(
+      getRandomGrid(TOTAL_ROWS, TOTAL_COLUMNS) as { row: number; column: number }
+  ); // создаем координаты еды змеи
+
+  const [currentTailCoordinates, setCurrentTailCoordinates] = useState({
+    row: currentHeadCoordinates.row,
+    column: currentHeadCoordinates.column,
+  }); // создаем координаты хвоста змеи
+
 
   const handleCurrentRowChange = (value: number) => {
     setCurrentHeadCoordinates({
       ...currentHeadCoordinates,
       row: value,
     });
-  };
+  }; // хендлер для смены положения головы змеи по рядам
 
   const handleCurrentColumnChange = (value: number) => {
     setCurrentHeadCoordinates({
       ...currentHeadCoordinates,
       column: value,
     });
-  };
-
-  const handeCurrentHeadCoordinatesChange = (row: number, column: number) => {
-    setCurrentHeadCoordinates({
-      row,
-      column,
-    });
-  };
-  // snake:{
-  //     head:{} as {row:number,col:number}
-  // }
-
-  const [currentDirection, setCurrentDirection] = useState<DIRECTION_TYPES>(
-    DIRECTION_TYPES.BOTTOM
-  );
+  }; // хендлер для смены положения головы змеи по колонкам
 
   useEffect(() => {
-    const id = setInterval(() => {
+    const id = setTimeout(() => {
       switch (currentDirection) {
         case DIRECTION_TYPES.LEFT:
           if (currentHeadCoordinates.column !== MIN_COLUMN_INDEX) {
             handleCurrentColumnChange(currentHeadCoordinates.column - 1);
+            setCurrentTailCoordinates({
+              row: currentHeadCoordinates.row,
+              column: currentHeadCoordinates.column,
+            });
             break;
           }
           break;
         case DIRECTION_TYPES.RIGHT:
           if (currentHeadCoordinates.column !== MAX_COLUMN_INDEX) {
             handleCurrentColumnChange(currentHeadCoordinates.column + 1);
+            setCurrentTailCoordinates({
+              row: currentHeadCoordinates.row,
+              column: currentHeadCoordinates.column,
+            });
             break;
           }
           break;
         case DIRECTION_TYPES.TOP:
           if (currentHeadCoordinates.row !== MIN_ROW_INDEX) {
             handleCurrentRowChange(currentHeadCoordinates.row - 1);
+            setCurrentTailCoordinates({
+              column: currentHeadCoordinates.column,
+              row: currentHeadCoordinates.row,
+            });
             break;
           }
           break;
         case DIRECTION_TYPES.BOTTOM:
           if (currentHeadCoordinates.row !== MAX_ROW_INDEX) {
             handleCurrentRowChange(currentHeadCoordinates.row + 1);
+            setCurrentTailCoordinates({
+              column: currentHeadCoordinates.column,
+              row: currentHeadCoordinates.row,
+            });
             break;
           }
           break;
@@ -94,46 +111,79 @@ export const TableSnake = () => {
         default:
           break;
       }
-    }, 500);
+    }, 400);
 
     return () => {
       clearInterval(id);
     };
   }, [currentDirection, currentHeadCoordinates]);
-  const getClassName = (isFood: boolean, isHead: boolean) => {
+
+  useEffect(() => {
+    const handleChangeCurrentOnKey = (e: KeyboardEvent) => {
+      switch (e.keyCode) {
+        case 37:
+          setCurrentDirection(DIRECTION_TYPES.LEFT);
+          break;
+        case 38:
+          setCurrentDirection(DIRECTION_TYPES.TOP);
+          break;
+        case 39:
+        default:
+          setCurrentDirection(DIRECTION_TYPES.RIGHT);
+          break;
+        case 40:
+          setCurrentDirection(DIRECTION_TYPES.BOTTOM);
+          break;
+      }
+    };
+    document.addEventListener("keydown", (e) => handleChangeCurrentOnKey(e));
+    return () => {
+      document.removeEventListener("keydown", (e) =>
+          handleChangeCurrentOnKey(e)
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+        currentFoodCoordinates.row === currentHeadCoordinates.row &&
+        currentFoodCoordinates.column === currentHeadCoordinates.column
+    ) {
+      setCurrentFoodCoordinates(getRandomGrid(TOTAL_ROWS, TOTAL_COLUMNS))
+    }
+  }, [currentFoodCoordinates, currentHeadCoordinates]);
+
+  const getClassName = (isFood: boolean, isHead: boolean, isTail: boolean) => {
     if (isFood) return s.tableFoot;
     if (isHead) return s.headSnake;
+    if (isTail) return s.headSnake;
     return s.tableItem;
   };
-  return (
-    <>
-      <div className={s.mainContainer}>
-        <div className={s.tableSnake}>
-          {arrItems.map((it) => {
-            const isHead =
-              it.column === currentHeadCoordinates.column &&
-              it.row === currentHeadCoordinates.row;
-            return (
-              <div
-                key={it.row + "-" + it.column}
-                className={getClassName(it.isFood, isHead)}
-              />
-            );
-          })}
-        </div>
-      </div>
 
-      <div>
-        {(
-          Object.keys(DIRECTION_TYPES) as Array<keyof typeof DIRECTION_TYPES>
-        ).map((key) => {
-          return (
-            <button onClick={() => setCurrentDirection(DIRECTION_TYPES[key])}>
-              {key}
-            </button>
-          );
-        })}
-      </div>
-    </>
+  return (
+      <>
+        <div className={s.mainContainer}>
+          <div className={s.tableSnake}>
+            {arrItems.map((it) => {
+              const isHead =
+                  it.column === currentHeadCoordinates.column &&
+                  it.row === currentHeadCoordinates.row;
+
+              const isFood =
+                  it.row === currentFoodCoordinates.row &&
+                  it.column === currentFoodCoordinates.column;
+              const isTail =
+                  it.column === currentTailCoordinates.column &&
+                  it.row === currentTailCoordinates.row;
+              return (
+                  <div
+                      key={it.row + "-" + it.column}
+                      className={getClassName(isFood, isHead, isTail)}
+                  />
+              );
+            })}
+          </div>
+        </div>
+      </>
   );
 };
