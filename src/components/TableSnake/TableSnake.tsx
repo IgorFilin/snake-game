@@ -24,14 +24,14 @@ export const INITIAL_ROW = 5;
 
 export const TableSnake = () => {
   const [arrItems, setArrItems] = useState(
-      createArrayGrid(TOTAL_ROWS, TOTAL_COLUMNS) as Array<{
-        row: number;
-        column: number;
-      }>
+    createArrayGrid(TOTAL_ROWS, TOTAL_COLUMNS) as Array<{
+      row: number;
+      column: number;
+    }>
   ); // Создаём массив с 100 ячейками
 
   const [currentDirection, setCurrentDirection] = useState<DIRECTION_TYPES>(
-      DIRECTION_TYPES.BOTTOM
+    DIRECTION_TYPES.BOTTOM
   ); // направление движения   RIGHT,LEFT,TOP,BOTTOM
 
   const [currentHeadCoordinates, setCurrentHeadCoordinates] = useState({
@@ -40,7 +40,7 @@ export const TableSnake = () => {
   }); // создаем координаты головы змейки
 
   const [currentFoodCoordinates, setCurrentFoodCoordinates] = useState(
-      getRandomGrid(TOTAL_ROWS, TOTAL_COLUMNS) as { row: number; column: number }
+    getRandomGrid(TOTAL_ROWS, TOTAL_COLUMNS) as { row: number; column: number }
   ); // создаем координаты еды змеи
 
   const [currentTailCoordinates, setCurrentTailCoordinates] = useState([
@@ -71,13 +71,13 @@ export const TableSnake = () => {
           if (currentHeadCoordinates.column !== MIN_COLUMN_INDEX) {
             handleCurrentColumnChange(currentHeadCoordinates.column - 1);
             setCurrentTailCoordinates(
-                currentTailCoordinates.map((el) => {
-                  return {
-                    ...el,
-                    row: currentHeadCoordinates.row,
-                    column: currentHeadCoordinates.column,
-                  };
-                })
+              currentTailCoordinates.map((el, i) => {
+                return {
+                  ...el,
+                  row: currentHeadCoordinates.row,
+                  column: currentHeadCoordinates.column + i - 1,
+                };
+              })
             );
             break;
           }
@@ -86,13 +86,13 @@ export const TableSnake = () => {
           if (currentHeadCoordinates.column !== MAX_COLUMN_INDEX) {
             handleCurrentColumnChange(currentHeadCoordinates.column + 1);
             setCurrentTailCoordinates(
-                currentTailCoordinates.map((el) => {
-                  return {
-                    ...el,
-                    row: currentHeadCoordinates.row,
-                    column: currentHeadCoordinates.column,
-                  };
-                })
+              currentTailCoordinates.map((el, i) => {
+                return {
+                  ...el,
+                  row: currentHeadCoordinates.row,
+                  column: currentHeadCoordinates.column - i + 1,
+                };
+              })
             );
             break;
           }
@@ -101,13 +101,13 @@ export const TableSnake = () => {
           if (currentHeadCoordinates.row !== MIN_ROW_INDEX) {
             handleCurrentRowChange(currentHeadCoordinates.row - 1);
             setCurrentTailCoordinates(
-                currentTailCoordinates.map((el) => {
-                  return {
-                    ...el,
-                    row: currentHeadCoordinates.row,
-                    column: currentHeadCoordinates.column,
-                  };
-                })
+              currentTailCoordinates.map((el, i) => {
+                return {
+                  ...el,
+                  row: currentHeadCoordinates.row + i - 1,
+                  column: currentHeadCoordinates.column,
+                };
+              })
             );
             break;
           }
@@ -116,13 +116,13 @@ export const TableSnake = () => {
           if (currentHeadCoordinates.row !== MAX_ROW_INDEX) {
             handleCurrentRowChange(currentHeadCoordinates.row + 1);
             setCurrentTailCoordinates(
-                currentTailCoordinates.map((el) => {
-                  return {
-                    ...el,
-                    row: currentHeadCoordinates.row,
-                    column: currentHeadCoordinates.column,
-                  };
-                })
+              currentTailCoordinates.map((el, i) => {
+                return {
+                  ...el,
+                  row: currentHeadCoordinates.row - i + 1,
+                  column: currentHeadCoordinates.column,
+                };
+              })
             );
             break;
           }
@@ -134,7 +134,7 @@ export const TableSnake = () => {
     }, 400);
 
     return () => {
-      clearInterval(id);
+      clearTimeout(id);
     };
   }, [currentDirection, currentHeadCoordinates]);
 
@@ -157,17 +157,18 @@ export const TableSnake = () => {
       }
     };
     document.addEventListener("keydown", (e) => handleChangeCurrentOnKey(e));
+
     return () => {
       document.removeEventListener("keydown", (e) =>
-          handleChangeCurrentOnKey(e)
+        handleChangeCurrentOnKey(e)
       );
     };
   }, []);
 
   useEffect(() => {
     if (
-        currentFoodCoordinates.row === currentHeadCoordinates.row &&
-        currentFoodCoordinates.column === currentHeadCoordinates.column
+      currentFoodCoordinates.row === currentHeadCoordinates.row &&
+      currentFoodCoordinates.column === currentHeadCoordinates.column
     ) {
       setCurrentFoodCoordinates(getRandomGrid(TOTAL_ROWS, TOTAL_COLUMNS));
 
@@ -181,37 +182,31 @@ export const TableSnake = () => {
         ]);
       }
       if (currentDirection === DIRECTION_TYPES.TOP) {
-        setCurrentTailCoordinates(
-            currentTailCoordinates.map((el) => {
-              return {
-                ...el,
-                row: currentHeadCoordinates.row,
-                column: currentHeadCoordinates.column + 1,
-              };
-            })
-        );
+        setCurrentTailCoordinates([
+          ...currentTailCoordinates,
+          {
+            row: currentTailCoordinates.slice(-1)[0].row + 1,
+            column: currentTailCoordinates.slice(-1)[0].column,
+          },
+        ]);
       }
       if (currentDirection === DIRECTION_TYPES.LEFT) {
-        setCurrentTailCoordinates(
-            currentTailCoordinates.map((el) => {
-              return {
-                ...el,
-                row: currentHeadCoordinates.row,
-                column: currentHeadCoordinates.column + 1,
-              };
-            })
-        );
+        setCurrentTailCoordinates([
+          ...currentTailCoordinates,
+          {
+            row: currentTailCoordinates.slice(-1)[0].row,
+            column: currentTailCoordinates.slice(-1)[0].column + 1,
+          },
+        ]);
       }
       if (currentDirection === DIRECTION_TYPES.RIGHT) {
-        setCurrentTailCoordinates(
-            currentTailCoordinates.map((el) => {
-              return {
-                ...el,
-                row: currentHeadCoordinates.row,
-                column: currentHeadCoordinates.column + 1,
-              };
-            })
-        );
+        setCurrentTailCoordinates([
+          ...currentTailCoordinates,
+          {
+            row: currentTailCoordinates.slice(-1)[0].row,
+            column: currentTailCoordinates.slice(-1)[0].column - 1,
+          },
+        ]);
       }
     }
   }, [currentFoodCoordinates, currentHeadCoordinates]); // хаваем
@@ -224,34 +219,37 @@ export const TableSnake = () => {
   };
 
   return (
-      <>
-        <div className={s.mainContainer}>
-          <div className={s.tableSnake}>
-            {arrItems.map((it) => {
-              const isHead =
-                  it.column === currentHeadCoordinates.column &&
-                  it.row === currentHeadCoordinates.row;
+    <>
+      <div className={s.mainContainer}>
+        <div className={s.tableSnake}>
+          {arrItems.map((it) => {
+            const isHead =
+              it.column === currentHeadCoordinates.column &&
+              it.row === currentHeadCoordinates.row;
 
-              const isFood =
-                  it.row === currentFoodCoordinates.row &&
-                  it.column === currentFoodCoordinates.column;
+            const isFood =
+              it.row === currentFoodCoordinates.row &&
+              it.column === currentFoodCoordinates.column;
 
-              const isTail = currentTailCoordinates.reduce((acc: any, temp) => {
-                if (it.row === temp.row && it.column === temp.column) {
+            const isTail: boolean = currentTailCoordinates.reduce(
+              (acc, current) => {
+                if (it.row === current.row && it.column === current.column) {
                   acc = true;
                   return acc;
-                }
-              }, false);
+                } else return acc;
+              },
+              false
+            );
 
-              return (
-                  <div
-                      key={it.row + "-" + it.column}
-                      className={getClassName(isFood, isHead, isTail)}
-                  />
-              );
-            })}
-          </div>
+            return (
+              <div
+                key={it.row + "-" + it.column}
+                className={getClassName(isFood, isHead, isTail)}
+              />
+            );
+          })}
         </div>
-      </>
+      </div>
+    </>
   );
 };
