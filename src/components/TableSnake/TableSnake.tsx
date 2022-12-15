@@ -137,7 +137,7 @@ export const TableSnake = () => {
       clearTimeout(id);
     };
   }, [currentDirection, currentHeadCoordinates]);
-
+  // let a = 1
   useEffect(() => {
     const handleChangeCurrentOnKey = (e: KeyboardEvent) => {
       switch (e.keyCode) {
