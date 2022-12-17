@@ -47,7 +47,7 @@ export const TableSnake = () => {
     {
       row: currentHeadCoordinates.row,
       column: currentHeadCoordinates.column,
-    },
+    },{},{},{}
   ] as Array<{ row: number; column: number }>); // создаем координаты хвоста змеи
 
   const handleCurrentRowChange = (value: number) => {
@@ -101,12 +101,12 @@ export const TableSnake = () => {
           if (currentHeadCoordinates.row !== MIN_ROW_INDEX) {
             handleCurrentRowChange(currentHeadCoordinates.row - 1);
             setCurrentTailCoordinates(
-              currentTailCoordinates.map((el, i) => {
-                return {
-                  ...el,
-                  row: currentHeadCoordinates.row + i - 1,
-                  column: currentHeadCoordinates.column,
-                };
+              currentTailCoordinates.map((el, i,arr) => {
+                  return {
+                    ...el,
+                    row: currentHeadCoordinates.row - 1,
+                    column: currentHeadCoordinates.column - 1 - i,
+                  }
               })
             );
             break;
