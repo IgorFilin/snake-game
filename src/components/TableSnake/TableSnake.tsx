@@ -40,9 +40,9 @@ export const TableSnake = () => {
 
             const positionChanger = (position:number) => {
                 if(position >= BOARD_SIZE){
-                    return 0
+                    return 9
                 }else if (position < 0){
-                    return BOARD_SIZE - 1
+                    return 0
                 }else return position
             }
             let move: Array<number> = []
