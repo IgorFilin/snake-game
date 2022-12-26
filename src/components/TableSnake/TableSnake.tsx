@@ -84,17 +84,19 @@ export const TableSnake = () => {
         }
     }, [snake, direction])
 
-    return <div>
-        {DEFAULT_CELLS_VALUE.map((row, indexR) => {
-            return <div key={indexR} className={s.row}>
-                {row.map((cell: any, indexC: number) => {
-                    let typeSnake = snake.some(el => el[0] === indexR && el[1] === indexC) && s.snake
-                    if(typeSnake !== s.snake){
-                        typeSnake =  food[0] === indexR && food[1] === indexC &&  s.food
-                    }
-                    return <div key={indexC} className={`${s.cell} ${typeSnake}`}></div>
-                })}
-            </div>
-        })}
+    return <div className={s.mainBlock}>
+        <div >
+            {DEFAULT_CELLS_VALUE.map((row, indexR) => {
+                return <div key={indexR} className={s.row}>
+                    {row.map((cell: any, indexC: number) => {
+                        let typeSnake = snake.some(el => el[0] === indexR && el[1] === indexC) && s.snake
+                        if(typeSnake !== s.snake){
+                            typeSnake =  food[0] === indexR && food[1] === indexC &&  s.food
+                        }
+                        return <div key={indexC} className={`${s.cell} ${typeSnake}`}></div>
+                    })}
+                </div>
+            })}
+        </div>
     </div>
 }
