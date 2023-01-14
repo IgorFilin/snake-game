@@ -1,32 +1,35 @@
 import React, {useEffect, useState} from "react";
 import s from "./TableSnake.module.scss";
-import {createArrayGrid} from "../utils/createArrayGrid";
 import {getRandomGrid} from "../utils/getRandomGrid";
-
-export enum DIRECTION_TYPES {
-    RIGHT,
-    LEFT,
-    TOP,
-    BOTTOM,
-}
 
 const BOARD_SIZE = 10
 const DEFAULT_CELLS_VALUE = Array(BOARD_SIZE).fill(Array(BOARD_SIZE).fill(0))
 const AVAILABLE_MOVES = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft']
-const SPEED = 200
+const SPEED = 500
 
 
 export const TableSnake = () => {
 
     const [direction, setDirection] = useState(AVAILABLE_MOVES[0])
     const [snake, setSnake] = useState([[1, 1]])
-    const [food, setFood] = useState(getRandomGrid(BOARD_SIZE,BOARD_SIZE))
+    const [food, setFood] = useState(getRandomGrid(BOARD_SIZE, BOARD_SIZE))
 
     const handleKeyDown = (event: KeyboardEvent) => {
-
         const index = AVAILABLE_MOVES.indexOf(event.key)
         if (index > -1) {
-            setDirection(AVAILABLE_MOVES[index])
+            if (direction === 'ArrowDown' && index !== 1) {
+                setDirection(AVAILABLE_MOVES[index])
+            }
+            if (direction === 'ArrowUp' && index !== 0) {
+                setDirection(AVAILABLE_MOVES[index])
+            }
+            if (direction === 'ArrowRight' && index !== 3) {
+                setDirection(AVAILABLE_MOVES[index])
+            }
+            if (direction === 'ArrowLeft' && index !== 2) {
+                setDirection(AVAILABLE_MOVES[index])
+            }
+
         }
     }
 
@@ -38,12 +41,12 @@ export const TableSnake = () => {
     useEffect(() => {
         const id = setTimeout(() => {
 
-            const positionChanger = (position:number) => {
-                if(position >= BOARD_SIZE){
+            const positionChanger = (position: number) => {
+                if (position >= BOARD_SIZE) {
                     return 9
-                }else if (position < 0){
-                    return 0
-                }else return position
+                } else if (position < 0) {
+                    return 9
+                } else return position
             }
             let move: Array<number> = []
 
@@ -72,9 +75,9 @@ export const TableSnake = () => {
             ]
             let spliceIndex = 1
             newSnake.push(head)
-            if(head[0] === food[0] && head[1]==food[1]){
+            if (head[0] === food[0] && head[1] == food[1]) {
                 spliceIndex = 0
-                setFood(getRandomGrid(BOARD_SIZE,BOARD_SIZE))
+                setFood(getRandomGrid(BOARD_SIZE, BOARD_SIZE))
             }
             setSnake(newSnake.splice(spliceIndex))
 
@@ -85,13 +88,13 @@ export const TableSnake = () => {
     }, [snake, direction])
 
     return <div className={s.mainBlock}>
-        <div >
+        <div>
             {DEFAULT_CELLS_VALUE.map((row, indexR) => {
                 return <div key={indexR} className={s.row}>
                     {row.map((cell: any, indexC: number) => {
                         let typeSnake = snake.some(el => el[0] === indexR && el[1] === indexC) && s.snake
-                        if(typeSnake !== s.snake){
-                            typeSnake =  food[0] === indexR && food[1] === indexC &&  s.food
+                        if (typeSnake !== s.snake) {
+                            typeSnake = food[0] === indexR && food[1] === indexC && s.food
                         }
                         return <div key={indexC} className={`${s.cell} ${typeSnake}`}></div>
                     })}
