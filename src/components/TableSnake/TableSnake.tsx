@@ -9,7 +9,7 @@ const SPEED = 500
 
 
 export const TableSnake = () => {
-
+  let tr;
     const [direction, setDirection] = useState(AVAILABLE_MOVES[0])
     const [snake, setSnake] = useState([[1, 1]])
     const [food, setFood] = useState(getRandomGrid(BOARD_SIZE, BOARD_SIZE))
