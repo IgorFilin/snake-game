@@ -9,32 +9,22 @@ const SPEED = 500
 
 
 export const TableSnake = () => {
-  let tr;
+    let tr;
     const [direction, setDirection] = useState(AVAILABLE_MOVES[0])
     const [snake, setSnake] = useState([[1, 1]])
     const [food, setFood] = useState(getRandomGrid(BOARD_SIZE, BOARD_SIZE))
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-        const index = AVAILABLE_MOVES.indexOf(event.key)
-        if (index > -1) {
-            if (direction === 'ArrowDown' && index !== 1) {
-                setDirection(AVAILABLE_MOVES[index])
-            }
-            if (direction === 'ArrowUp' && index !== 0) {
-                setDirection(AVAILABLE_MOVES[index])
-            }
-            if (direction === 'ArrowRight' && index !== 3) {
-                setDirection(AVAILABLE_MOVES[index])
-            }
-            if (direction === 'ArrowLeft' && index !== 2) {
-                setDirection(AVAILABLE_MOVES[index])
-            }
+    const handleKeyDown = (direction:string, event: KeyboardEvent) => {
 
+        const index = AVAILABLE_MOVES.indexOf(event.key)
+
+        if (index > -1) {  
+          setDirection(AVAILABLE_MOVES[index])
         }
     }
 
     useEffect(() => {
-        document.addEventListener('keydown', handleKeyDown)
+      document.addEventListener('keydown', (event) => handleKeyDown(direction,event))
     }, [])
 
 
