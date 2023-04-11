@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import s from "./TableSnake.module.scss";
-import {getRandomGrid} from "../utils/getRandomGrid";
+import { getRandomGrid } from "../utils/getRandomGrid";
 
 const BOARD_SIZE = 10
 const DEFAULT_CELLS_VALUE = Array(BOARD_SIZE).fill(Array(BOARD_SIZE).fill(0))
 const AVAILABLE_MOVES = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft']
-const SPEED = 500
+const SPEED = 300
 
 
 export const TableSnake = () => {
@@ -14,6 +14,8 @@ export const TableSnake = () => {
     const [snake, setSnake] = useState([[1, 1]])
     const [food, setFood] = useState(getRandomGrid(BOARD_SIZE, BOARD_SIZE))
 
+    const ref = useRef<any>()
+
     const handleKeyDown = (direction:string, event: KeyboardEvent) => {
 
         const index = AVAILABLE_MOVES.indexOf(event.key)
@@ -21,6 +23,10 @@ export const TableSnake = () => {
         if (index > -1) {  
           setDirection(AVAILABLE_MOVES[index])
         }
+    }
+
+    const stopHandler = () => {
+      ref.current.className = s.mainBlock + ' ' + s.mainBlock_stop
     }
 
     useEffect(() => {
@@ -77,7 +83,7 @@ export const TableSnake = () => {
         }
     }, [snake, direction])
 
-    return <div className={s.mainBlock}>
+    return <div ref={ref} className={s.mainBlock}>
         <div>
             {DEFAULT_CELLS_VALUE.map((row, indexR) => {
                 return <div key={indexR} className={s.row}>
@@ -90,6 +96,8 @@ export const TableSnake = () => {
                     })}
                 </div>
             })}
+              <button>Start</button>
+              <button onClick={stopHandler}>Stop</button>
         </div>
     </div>
 }
