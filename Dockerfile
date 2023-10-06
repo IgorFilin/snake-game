@@ -2,11 +2,15 @@ FROM node
 
 WORKDIR /appDocker
 
-COPY . .
+COPY package.json .
 
 RUN yarn
 
-EXPOSE 3000
+COPY . .
+
+ENV PORT 3001
+
+EXPOSE $PORT
 
 CMD ["yarn","start"]
 

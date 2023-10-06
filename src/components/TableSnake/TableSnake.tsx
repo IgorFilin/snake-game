@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
-import s from './TableSnake.module.scss';
-import { getRandomGrid } from '../utils/getRandomGrid';
+import React, { useEffect, useState, useRef } from "react";
+import s from "./TableSnake.module.scss";
+import { getRandomGrid } from "../utils/getRandomGrid";
 
 const BOARD_SIZE = 10;
 const DEFAULT_CELLS_VALUE = Array(BOARD_SIZE).fill(Array(BOARD_SIZE).fill(0));
-const AVAILABLE_MOVES = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'];
+const AVAILABLE_MOVES = ["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"];
 const SPEED = 300;
 
 export const TableSnake = () => {
@@ -24,11 +24,13 @@ export const TableSnake = () => {
   };
 
   const stopHandler = () => {
-    ref.current.className = s.mainBlock + ' ' + s.mainBlock_stop;
+    ref.current.className = s.mainBlock + " " + s.mainBlock_stop;
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', (event) => handleKeyDown(direction, event));
+    document.addEventListener("keydown", (event) =>
+      handleKeyDown(direction, event)
+    );
   }, []);
 
   useEffect(() => {
@@ -61,7 +63,10 @@ export const TableSnake = () => {
           break;
         }
       }
-      const head = [positionChanger(newSnake[newSnake.length - 1][0] + move[0]), positionChanger(newSnake[newSnake.length - 1][1] + move[1])];
+      const head = [
+        positionChanger(newSnake[newSnake.length - 1][0] + move[0]),
+        positionChanger(newSnake[newSnake.length - 1][1] + move[1]),
+      ];
       let spliceIndex = 1;
       newSnake.push(head);
       if (head[0] === food[0] && head[1] == food[1]) {
@@ -76,24 +81,21 @@ export const TableSnake = () => {
   }, [snake, direction]);
 
   return (
-    <div
-      ref={ref}
-      className={s.mainBlock}>
+    <div ref={ref} className={s.mainBlock}>
       <div>
         {DEFAULT_CELLS_VALUE.map((row, indexR) => {
           return (
-            <div
-              key={indexR}
-              className={s.row}>
+            <div key={indexR} className={s.row}>
               {row.map((cell: any, indexC: number) => {
-                let typeSnake = snake.some((el) => el[0] === indexR && el[1] === indexC) && s.snake;
+                let typeSnake =
+                  snake.some((el) => el[0] === indexR && el[1] === indexC) &&
+                  s.snake;
                 if (typeSnake !== s.snake) {
-                  typeSnake = food[0] === indexR && food[1] === indexC && s.food;
+                  typeSnake =
+                    food[0] === indexR && food[1] === indexC && s.food;
                 }
                 return (
-                  <div
-                    key={indexC}
-                    className={`${s.cell} ${typeSnake}`}></div>
+                  <div key={indexC} className={`${s.cell} ${typeSnake}`}></div>
                 );
               })}
             </div>
